@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Capivara
+GenericName=Baixador e transcritor de vídeos
+Comment=Baixe vídeos e áudios do YouTube, TikTok, Reels, Stories e transcreva localmente
+Exec=capivara %U
+Icon=capivara
+Terminal=false
+Categories=AudioVideo;Network;Utility;
+Keywords=youtube;tiktok;instagram;download;mp3;transcrição;whisper;
+StartupWMClass=Capivara

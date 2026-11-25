@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Capivara — baixa & transcreve</title>
+  <meta name="theme-color" content="#FFD23F">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    // aplica o tema antes de pintar (evita piscar)
+    (function () {
+      var t = localStorage.getItem('cap.theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Capivara">
+      <img src="/icon.svg" alt="" class="brand-icon">
+      <span class="brand-name">CAPIVARA</span>
+      <span class="brand-tag">baixa · extrai · transcreve</span>
+    </a>
+    <nav class="top-actions">
+      <button class="btn btn-sm" id="btn-engines" title="Motores">
+        <span class="dot" id="engines-dot"></span> Motores
+      </button>
+      <button class="btn btn-sm" id="btn-settings" title="Configurações">⚙ Ajustes</button>
+      <button class="btn btn-sm btn-icon" id="btn-theme" title="Tema claro/escuro" aria-label="Alternar tema">◐</button>
+      <button class="btn btn-sm btn-icon btn-danger" id="btn-quit" title="Fechar o Capivara" aria-label="Sair" hidden>⏻</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero card" id="hero">
+      <div class="hero-head">
+        <h1>Cola o link.<br><mark>A capivara</mark> resolve.</h1>
+        <div class="sticker" aria-hidden="true">100% local<br>sem anúncio</div>
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span class="pill p-yt">YouTube</span><span class="pill p-shorts">Shorts</span><span class="pill p-tt">TikTok</span><span class="pill p-ig">Reels</span><span class="pill p-ig2">Stories</span><span class="pill p-x">X / Twitter</span><span class="pill p-fb">Facebook</span><span class="pill p-vimeo">Vimeo</span><span class="pill p-sc">SoundCloud</span><span class="pill p-tw">Twitch</span><span class="pill p-rd">Reddit</span><span class="pill p-any">+1800 sites</span>
+          <span class="pill p-yt">YouTube</span><span class="pill p-shorts">Shorts</span><span class="pill p-tt">TikTok</span><span class="pill p-ig">Reels</span><span class="pill p-ig2">Stories</span><span class="pill p-x">X / Twitter</span><span class="pill p-fb">Facebook</span><span class="pill p-vimeo">Vimeo</span><span class="pill p-sc">SoundCloud</span><span class="pill p-tw">Twitch</span><span class="pill p-rd">Reddit</span><span class="pill p-any">+1800 sites</span>
+        </div>
+      </div>
+
+      <div class="setup-banner" id="setup-banner" hidden>
+        <div>
+          <strong>Primeira vez por aqui?</strong>
+          <span id="setup-missing">Faltam os motores de download.</span>
+        </div>
+        <button class="btn btn-pink" id="btn-setup-all">Instalar tudo ⚡</button>
+      </div>
+
+      <form class="url-box" id="url-form" autocomplete="off">
+        <span class="plat-badge" id="plat-badge">🔗</span>
+        <input id="url" type="url" inputmode="url" placeholder="https://youtube.com/shorts/… · tiktok.com/@… · instagram.com/reel/…" aria-label="Link do vídeo">
+        <button type="button" class="btn btn-sm" id="btn-paste">Colar</button>
+        <button type="button" class="btn btn-sm btn-icon" id="btn-clear" aria-label="Limpar" hidden>✕</button>
+      </form>
+      <div class="hint" id="url-hint"></div>
+
+      <div class="preview" id="preview" hidden>
+        <div class="thumb" id="pv-thumb"></div>
+        <div class="pv-body">
+          <div class="pv-badges" id="pv-badges"></div>
+          <h3 id="pv-title"></h3>
+          <p class="muted" id="pv-meta"></p>
+        </div>
+      </div>
+
+      <div class="modes" role="tablist">
+        <button class="mode is-on" data-mode="video" role="tab"><span class="mode-ico">▶</span> Vídeo</button>
+        <button class="mode" data-mode="audio" role="tab"><span class="mode-ico">♫</span> Áudio</button>
+        <button class="mode" data-mode="transcript" role="tab"><span class="mode-ico">✎</span> Transcrição</button>
+      </div>
+
+      <div class="options" id="opts-video" data-panel="video">
+        <div class="opt-group">
+          <label class="opt-label">Qualidade</label>
+          <div class="chips" data-key="quality">
+            <button data-v="best" class="chip is-on">Máxima</button>
+            <button data-v="2160" class="chip">4K</button>
+            <button data-v="1440" class="chip">1440p</button>
+            <button data-v="1080" class="chip">1080p</button>
+            <button data-v="720" class="chip">720p</button>
+            <button data-v="480" class="chip">480p</button>
+            <button data-v="360" class="chip">360p</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">Formato</label>
+          <div class="chips" data-key="vformat">
+            <button data-v="mp4" class="chip is-on">MP4</button>
+            <button data-v="mkv" class="chip">MKV</button>
+            <button data-v="webm" class="chip">WEBM</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">Extras</label>
+          <div class="toggles">
+            <button class="toggle is-on" data-flag="compat" title="Prefere H.264 — abre em qualquer player, celular e editor">Compatível</button>
+            <button class="toggle is-on" data-flag="thumbnail">Capa</button>
+            <button class="toggle" data-flag="subs">Legendas</button>
+            <button class="toggle" data-flag="playlist" data-pl>Playlist inteira</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="options" id="opts-audio" data-panel="audio" hidden>
+        <div class="opt-group">
+          <label class="opt-label">Formato</label>
+          <div class="chips" data-key="aformat">
+            <button data-v="mp3" class="chip is-on">MP3</button>
+            <button data-v="m4a" class="chip">M4A</button>
+            <button data-v="opus" class="chip">OPUS</button>
+            <button data-v="wav" class="chip">WAV</button>
+            <button data-v="flac" class="chip">FLAC</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">Extras</label>
+          <div class="toggles">
+            <button class="toggle is-on" data-flag="thumbnail">Capa no arquivo</button>
+            <button class="toggle" data-flag="playlist" data-pl>Playlist inteira</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="options" id="opts-transcript" data-panel="transcript" hidden>
+        <div class="opt-group">
+          <label class="opt-label">Fonte</label>
+          <div class="chips" data-key="source">
+            <button data-v="auto" class="chip is-on" title="Usa a legenda do site se existir; senão, ouve com o Whisper">Inteligente</button>
+            <button data-v="captions" class="chip" title="Só legendas do site — instantâneo">Só legenda</button>
+            <button data-v="whisper" class="chip" title="Ouve o áudio com IA local — funciona em qualquer vídeo">Só Whisper (IA)</button>
+          </div>
+        </div>
+        <div class="opt-row">
+          <div class="opt-group">
+            <label class="opt-label" for="t-lang">Idioma</label>
+            <select id="t-lang" class="select"></select>
+          </div>
+          <div class="opt-group">
+            <label class="opt-label" for="t-model">Modelo IA</label>
+            <select id="t-model" class="select"></select>
+          </div>
+          <div class="opt-group">
+            <label class="opt-label">Tarefa</label>
+            <div class="chips" data-key="task">
+              <button data-v="transcribe" class="chip is-on">Transcrever</button>
+              <button data-v="translate" class="chip">Traduzir → EN</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-go" id="btn-go" disabled>
+        <span id="go-label">Baixar vídeo</span> <span class="arrow">→</span>
+      </button>
+    </section>
+
+    <section class="drop card" id="drop">
+      <input type="file" id="file" accept="audio/*,video/*" hidden multiple>
+      <div class="drop-inner">
+        <div class="drop-ico">✎</div>
+        <div>
+          <h2>Transcrever arquivo</h2>
+          <p class="muted">Arraste um áudio ou vídeo do computador aqui — ou <button class="link" id="btn-pick">escolha um arquivo</button>. Vira TXT, SRT e VTT.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="queue">
+      <div class="queue-head">
+        <h2>Fila <span class="count" id="count">0</span></h2>
+        <div class="queue-actions">
+          <button class="btn btn-sm" id="btn-open-folder" hidden>📂 Abrir pasta</button>
+          <button class="btn btn-sm" id="btn-clear-done">Limpar concluídos</button>
+        </div>
+      </div>
+      <div id="jobs" class="jobs"></div>
+      <div class="empty" id="empty">
+        <div class="empty-art">🦫</div>
+        <p><strong>Nada na fila ainda.</strong><br>Cola um link lá em cima e manda ver.</p>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Capivara <span id="ver"></span></span> ·
+      <span>baixe só o que você tem direito de baixar ✌</span>
+    </footer>
+  </main>
+
+  <!-- Motores -->
+  <dialog id="dlg-engines" class="dlg">
+    <div class="dlg-head">
+      <h2>Motores</h2>
+      <button class="btn btn-sm btn-icon" data-close aria-label="Fechar">✕</button>
+    </div>
+    <p class="muted">O Capivara usa ferramentas livres por baixo do capô. Instale uma vez e pronto.</p>
+    <div id="engines-list" class="eng-list"></div>
+    <h3>Modelos de transcrição (Whisper)</h3>
+    <p class="muted">Rodam no seu computador. Maiores = mais precisos e mais lentos.</p>
+    <div id="models-list" class="eng-list"></div>
+  </dialog>
+
+  <!-- Configurações -->
+  <dialog id="dlg-settings" class="dlg">
+    <div class="dlg-head">
+      <h2>Ajustes</h2>
+      <button class="btn btn-sm btn-icon" data-close aria-label="Fechar">✕</button>
+    </div>
+    <form id="settings-form" class="form">
+      <label>Pasta de destino
+        <input name="output_dir" class="input" required>
+      </label>
+      <label>Cookies do navegador <small>(para Stories, conteúdo privado ou com idade)</small>
+        <select name="cookies_browser" class="select">
+          <option value="">Nenhum</option>
+          <option value="chrome">Chrome</option>
+          <option value="firefox">Firefox</option>
+          <option value="edge">Edge</option>
+          <option value="brave">Brave</option>
+          <option value="opera">Opera</option>
+          <option value="vivaldi">Vivaldi</option>
+          <option value="chromium">Chromium</option>
+          <option value="safari">Safari</option>
+        </select>
+      </label>
+      <label>…ou arquivo cookies.txt <small>(caminho no computador)</small>
+        <input name="cookies_file" class="input" placeholder="C:\caminho\cookies.txt">
+      </label>
+      <div class="form-row">
+        <label>Modelo padrão
+          <select name="whisper_model" class="select" id="s-model"></select>
+        </label>
+        <label>Idioma padrão
+          <select name="language" class="select" id="s-lang"></select>
+        </label>
+        <label>Downloads simultâneos
+          <input name="max_parallel" type="number" min="1" max="8" class="input">
+        </label>
+      </div>
+      <p class="muted small">Downloads simultâneos vale depois de reabrir o app.</p>
+      <button class="btn btn-go btn-sm-go" type="submit">Salvar</button>
+    </form>
+  </dialog>
+
+  <!-- Transcrição -->
+  <dialog id="dlg-transcript" class="dlg dlg-wide">
+    <div class="dlg-head">
+      <h2 id="tr-title">Transcrição</h2>
+      <button class="btn btn-sm btn-icon" data-close aria-label="Fechar">✕</button>
+    </div>
+    <div class="tr-tools">
+      <input class="input" id="tr-search" placeholder="Buscar no texto…">
+      <button class="toggle" id="tr-times">Tempos</button>
+      <button class="btn btn-sm" id="tr-copy">Copiar</button>
+      <span id="tr-files" class="tr-files"></span>
+    </div>
+    <div class="tr-meta muted" id="tr-meta"></div>
+    <div class="tr-body" id="tr-body"></div>
+  </dialog>
+
+  <!-- Login (modo web com senha) -->
+  <div class="login" id="login" hidden>
+    <form class="card login-card" id="login-form">
+      <img src="/icon.svg" alt="" width="72">
+      <h2>Capivara</h2>
+      <p class="muted">Esse servidor tem senha.</p>
+      <input class="input" type="password" id="login-pass" placeholder="Senha" autocomplete="current-password">
+      <button class="btn btn-go btn-sm-go">Entrar</button>
+    </form>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="dropping" id="dropping" hidden><div>Solta aqui! 🦫</div></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

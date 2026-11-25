@@ -1,0 +1,16 @@
+services:
+  capivara:
+    build: .
+    image: capivara:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Troque! Sem senha qualquer pessoa na rede usa seu servidor.
+      CAPIVARA_TOKEN: "troque-esta-senha"
+    volumes:
+      - ./downloads:/downloads
+      - capivara-data:/data
+    restart: unless-stopped
+
+volumes:
+  capivara-data:

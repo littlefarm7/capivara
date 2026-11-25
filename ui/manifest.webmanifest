@@ -1,0 +1,17 @@
+{
+  "name": "Capivara — baixa e transcreve",
+  "short_name": "Capivara",
+  "description": "Baixe vídeos e áudios do YouTube, Shorts, TikTok, Reels, Stories e +1800 sites — e transcreva tudo localmente.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF4D6",
+  "theme_color": "#FFD23F",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}
