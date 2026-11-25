@@ -352,12 +352,11 @@ async fn install_ffmpeg(paths: &Paths, progress: &mut (impl FnMut(f32, String) +
     std::fs::create_dir_all(&work)?;
     let result = async {
         if cfg!(target_os = "macos") {
-            for (bin, url) in [
-                ("ffmpeg", "https://evermeet.cx/ffmpeg/getrelease/zip"),
-                ("ffprobe", "https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"),
-            ] {
+            let arch = if ARCH == "aarch64" { "arm64" } else { "amd64" };
+            for bin in ["ffmpeg", "ffprobe"] {
+                let url = format!("https://ffmpeg.martin-riedl.de/redirect/latest/macos/{arch}/release/{bin}.zip");
                 let zip = work.join(format!("{bin}.zip"));
-                fetch(url, &zip, |p, b| progress(p, format!("{bin} · {:.1} MB", b as f64 / 1e6))).await?;
+                fetch(&url, &zip, |p, b| progress(p, format!("{bin} · {:.1} MB", b as f64 / 1e6))).await?;
                 for f in extract_zip(&zip, &[bin], tools)? {
                     make_exec(&f)?;
                 }

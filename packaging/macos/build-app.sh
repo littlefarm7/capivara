@@ -21,10 +21,15 @@ lipo -create -output "$APP/Contents/MacOS/capivara" \
 if [ "${BUNDLE_ENGINES:-1}" = "1" ]; then
   TMP="$(mktemp -d)"
   curl -fsSL -o "$APP/Contents/Resources/bin/yt-dlp" https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
-  curl -fsSL -o "$TMP/ffmpeg.zip" https://evermeet.cx/ffmpeg/getrelease/zip
-  curl -fsSL -o "$TMP/ffprobe.zip" https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip
-  unzip -oq "$TMP/ffmpeg.zip" -d "$APP/Contents/Resources/bin"
-  unzip -oq "$TMP/ffprobe.zip" -d "$APP/Contents/Resources/bin"
+  # ffmpeg/ffprobe nativos (arm64 + Intel) unidos num binário universal
+  for bin in ffmpeg ffprobe; do
+    for arch in arm64 amd64; do
+      curl -fsSL -o "$TMP/$bin-$arch.zip" "https://ffmpeg.martin-riedl.de/redirect/latest/macos/$arch/release/$bin.zip"
+      mkdir -p "$TMP/$arch"
+      unzip -oq "$TMP/$bin-$arch.zip" -d "$TMP/$arch"
+    done
+    lipo -create -output "$APP/Contents/Resources/bin/$bin" "$TMP/arm64/$bin" "$TMP/amd64/$bin"
+  done
   ARCH_DENO=$([ "$(uname -m)" = "arm64" ] && echo aarch64 || echo x86_64)
   curl -fsSL -o "$TMP/deno.zip" "https://github.com/denoland/deno/releases/latest/download/deno-$ARCH_DENO-apple-darwin.zip"
   unzip -oq "$TMP/deno.zip" -d "$APP/Contents/Resources/bin"
