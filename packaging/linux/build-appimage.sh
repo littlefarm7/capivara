@@ -43,9 +43,12 @@ if [ "${BUNDLE_ENGINES:-1}" = "1" ]; then
   rm -rf "$TMP"
 fi
 
-cp ui/icon.svg "$APPDIR/capivara.svg"
+# .DirIcon precisa ser PNG de verdade (link para SVG é rejeitado pelo appimagetool).
+mkdir -p "$APPDIR/usr/share/icons/hicolor/512x512/apps"
+cp packaging/windows/capivara-512.png "$APPDIR/capivara.png"
+cp packaging/windows/capivara-512.png "$APPDIR/.DirIcon"
+cp packaging/windows/capivara-512.png "$APPDIR/usr/share/icons/hicolor/512x512/apps/capivara.png"
 cp ui/icon.svg "$APPDIR/usr/share/icons/hicolor/scalable/apps/capivara.svg"
-ln -sf capivara.svg "$APPDIR/.DirIcon"
 cp packaging/linux/capivara.desktop "$APPDIR/capivara.desktop"
 cp packaging/linux/capivara.desktop "$APPDIR/usr/share/applications/capivara.desktop"
 
